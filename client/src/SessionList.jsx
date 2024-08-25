@@ -19,7 +19,7 @@ const SessionListPage = () => {
   };
 
   useEffect(() => {
-    fetch("http://35.154.39.136:8000/session")
+    fetch("http://http://127.0.0.1:8000/session")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
