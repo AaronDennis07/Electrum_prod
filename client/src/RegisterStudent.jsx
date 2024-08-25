@@ -23,8 +23,22 @@ const RegisterStudent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <Toaster position="top-right" />
+<div className="min-h-screen flex flex-col">
+        <div className="bg-white border-b border-gray-200 py-4">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-gray-600">
+            <p className="text-sm mb-1">
+              Designed & Developed by <strong>S Aaron Dennis </strong>and <strong> Surya K N</strong> (Final Year Students, CSE Department, NHCE)
+            </p>
+           
+             <p className="text-sm mb-2">
+              Under the Guidance of <strong> Ms. Asha Rani Borah </strong> (Senior AP, CSE Dept.) and <strong>Dr. R J Anandhi (Prof & Dean Academics) </strong>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="flex-grow bg-gradient-to-br from-blue-100 to-indigo-200 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <Toaster position="top-right" />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Student Registration
@@ -110,6 +124,7 @@ const RegisterStudent = () => {
           </form>
         </div>
       </div>
+    </div>
     </div>
   );
 };
