@@ -204,7 +204,7 @@ func StartSession(c *fiber.Ctx) error {
 	}
 
 	for _, course := range sessionDb.Courses {
-		err = cache.Client.Redis.HSet(ctx.Ctx, courseKey, *course.Code, *course.Seats).Err()
+		err = cache.Client.Redis.HSet(ctx.Ctx, courseKey, course.ID, *course.Seats).Err()
 		if err != nil {
 			log.Println("populating session redis", err)
 		}
@@ -218,7 +218,7 @@ func StartSession(c *fiber.Ctx) error {
 			if err != nil {
 				log.Println("populating students redis", err)
 			}
-			cache.Client.Redis.HIncrBy(ctx.Ctx, courseKey, *enrollment.Course1.Code, -1)
+			cache.Client.Redis.HIncrBy(ctx.Ctx, courseKey, string(enrollment.Course1.ID), -1)
 
 		}
 		if enrollment.Course1ID == nil {
@@ -348,7 +348,7 @@ func EnrollToCourse(c *fiber.Ctx) error {
 		var session models.Session
 		db.Where("name=?", channel).First(&session)
 		var course models.Course
-		db.Where("code=? AND session_id=?", req.Course, session.ID).First(&course)
+		db.Where("id=? AND session_id=?", req.Course, session.ID).First(&course)
 
 		err = db.Model(&course).Update("seats_filled", gorm.Expr("seats_filled + ?", 1)).Error
 		err = db.Model(&session).Update("applied_students", gorm.Expr("applied_students + ?", 1)).Error

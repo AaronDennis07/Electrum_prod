@@ -1,4 +1,4 @@
-const API_URL = "http://http://127.0.0.1:8000/auth"; // Replace with your API URL
+const API_URL = "http://127.0.0.1:8000/auth"; // Replace with your API URL
 
 export const loginStudent = async (usn, password) => {
   console.log(usn, password);
