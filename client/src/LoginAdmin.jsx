@@ -16,7 +16,7 @@ const LoginAdmin = () => {
     e.preventDefault();
     try {
       const data = await loginAdmin(email, password);
-      loginAdmin(data.token, userType);
+      login(data.token, userType);
       navigate("/admin/session");
     } catch (error) {
       console.error("Login failed:");

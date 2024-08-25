@@ -33,6 +33,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("userType");
     localStorage.removeItem("userId");
+    localStorage.removeItem("previous_course");
+    localStorage.removeItem("previous_course_id");
+    
     setUser(null);
   };
   if (loading) return <div>loading..</div>;

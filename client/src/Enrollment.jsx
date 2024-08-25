@@ -1,17 +1,30 @@
 import { useState, useEffect } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { useUser } from "./UserContext"; // Import the useUser hook
 import { useAuth } from "./AuthContext";
 
 const EnrollmentPeriodCourses = () => {
   const { sessionName } = useParams();
-  const { user } = useAuth(); // Use the user.userId from context
+  
+  const { user,logout } = useAuth(); // Use the user.userId from context
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [enrollingCourse, setEnrollingCourse] = useState(null);
   const [enrolled, setEnrolled] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+   logout(); 
+    navigate('/login');
+  };
+
+  const handleHomeClick = () => {
+    navigate('/session'); // Adjust this path to your actual home page route
+  };
+
 
   useEffect(() => {
     console.log( user)
@@ -28,7 +41,7 @@ const EnrollmentPeriodCourses = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/session/${sessionName}`,
+        `http://localhost:8000/session/${sessionName}`,
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -50,7 +63,7 @@ const EnrollmentPeriodCourses = () => {
   const checkEnrollmentStatus = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/session/${sessionName}/checkenrollment/${user.userId}`,
+        `http://localhost:8000/session/${sessionName}/checkenrollment/${user.userId}`,
       );
       if (!response.ok) {
         throw new Error("Failed to check enrollment status");
@@ -67,7 +80,7 @@ const EnrollmentPeriodCourses = () => {
 
   useEffect(() => {
     if (courses.length > 0) {
-      const ws = new WebSocket(`ws://127.0.0.1:8000/session/ws/${sessionName}`);
+      const ws = new WebSocket(`ws://localhost:8000/session/ws/${sessionName}`);
 
       ws.onopen = () => {
         console.log("WebSocket Connected");
@@ -100,7 +113,7 @@ const EnrollmentPeriodCourses = () => {
     setEnrolled(courseCode)
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/session/${sessionName}/enroll`,
+        `http://localhost:8000/session/${sessionName}/enroll`,
         {
           method: "POST",
           headers: {
@@ -135,6 +148,36 @@ const EnrollmentPeriodCourses = () => {
     return <div className="text-center mt-8 text-red-500">{error}</div>;
 
   return (
+    <div className="bg-gray-100 min-h-screen">
+      {/* Navbar */}
+<nav className="bg-indigo-600 p-4">
+  <div className="container mx-auto flex justify-between items-center">
+    <button onClick={handleHomeClick} className="text-white hover:text-indigo-200">
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+      </svg>
+    </button>
+    <div className="text-white text-2xl font-bold">Electrum@NHCE</div>
+    <div className="hidden md:flex items-center">
+      <button onClick={handleLogout} className="text-white hover:text-indigo-200">Logout</button>
+    </div>
+    <div className="md:hidden">
+      <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white">
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-indigo-500 p-4">
+          <button onClick={handleHomeClick} className="block text-white mb-2">Home</button>
+          <button onClick={handleLogout} className="block text-white">Logout</button>
+        </div>
+      )}
     <div className="container mx-auto p-4 bg-gray-100">
       <Toaster position="top-right" />
       <h1 className="text-3xl font-bold mb-6 text-center text-indigo-800">
@@ -234,6 +277,7 @@ const EnrollmentPeriodCourses = () => {
             ) : null;
         })}
       </div>
+    </div>
     </div>
   );
 };
