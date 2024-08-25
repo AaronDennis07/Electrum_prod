@@ -40,27 +40,30 @@ const EnrollmentPeriodCourses = () => {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/session/${sessionName}`
-      );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      setCourses(
-        data.courses.map((course) => ({
-          ...course,
-          availableSeats: course.Seats,
-        }))
-      );
-      setLoading(false);
+        const response = await fetch(
+            `http://127.0.0.1:8000/session/${sessionName}`
+        );
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        const mappedCourses = data.courses.map((course) => ({
+            ...course,
+            availableSeats: course.Seats,
+        }));
+        
+        // Sort courses by Id in ascending order
+        const sortedCourses = mappedCourses.sort((a, b) => a.Id - b.Id);
+
+        setCourses(sortedCourses);
+        setLoading(false);
     } catch (error) {
-      setError("Failed to fetch courses");
-      setLoading(false);
-      toast.error("Failed to load courses. Please try again later.");
+        setError("Failed to fetch courses");
+        setLoading(false);
+        toast.error("Failed to load courses. Please try again later.");
     }
     checkEnrollmentStatus();
-  };
+};
   const checkEnrollmentStatus = async () => {
     // console.log("helooooooooooooooooooooooooo");
     try {
