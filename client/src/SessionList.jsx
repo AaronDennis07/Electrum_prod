@@ -198,6 +198,19 @@ const SessionListPage = () => {
           </button>
         </div>
       )}
+       <div className="bg-white border-b border-gray-200 py-4">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-gray-600">
+            <p className="text-sm mb-1">
+              Designed & Developed by <strong>S Aaron Dennis </strong>and <strong> Surya K N</strong> (Final Year Students, CSE Department, NHCE)
+            </p>
+           
+             <p className="text-sm mb-1">
+              Under the Guidance of <strong> Ms. Asha Rani Borah </strong> (Senior AP, CSE Dept.) and <strong>Dr. R J Anandhi (Prof & Dean Academics) </strong>
+            </p>
+          </div>
+        </div>
+      </div>
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Session List</h1>
         {renderSessionSection("Live", liveSessions)}
