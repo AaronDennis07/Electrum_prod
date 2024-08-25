@@ -249,7 +249,7 @@ const EnrollmentPeriodCourses = () => {
             </p>
            
              <p className="text-sm mb-1">
-              Under the Guidance of <strong> Ms. Asha Rani Borah </strong> (Senior AP, CSE Dept.) and <strong>Dr. R J Anandhi (Prof & Dean Academics) </strong>
+              Under the Guidance of <strong> Ms. Asha Rani Borah </strong> (Senior AP, CSE Department, NHCE) and <strong>Dr. R J Anandhi </strong>(Professor and Dean Academics, NHCE) 
             </p>
           </div>
         </div>
