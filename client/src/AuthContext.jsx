@@ -23,8 +23,8 @@ export const AuthProvider = ({ children }) => {
   const login = (token, userType, userId,previous_course,previous_course_id) => {
     localStorage.setItem("token", token);
     localStorage.setItem("userType", userType);
-    localStorage.setItem("previous_course", previous_course);
-    localStorage.setItem("previous_course_id", previous_course_id.replace("6", "7"));
+    localStorage.setItem("previous_course",userType==="student"?  previous_course : null);
+    localStorage.setItem("previous_course_id",userType==="student"? previous_course_id.replace("6", "7"):null);
     localStorage.setItem("userId", userId);
     setUser({ token, userType,userId, previous_course,previous_course_id});
   };

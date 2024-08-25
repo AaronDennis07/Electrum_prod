@@ -28,7 +28,7 @@ const EnrollmentPeriodCourses = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8000/session/${sessionName}`,
+        `http://127.0.0.1:8000/session/${sessionName}`,
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -50,7 +50,7 @@ const EnrollmentPeriodCourses = () => {
   const checkEnrollmentStatus = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/session/${sessionName}/checkenrollment/${user.userId}`,
+        `http://127.0.0.1:8000/session/${sessionName}/checkenrollment/${user.userId}`,
       );
       if (!response.ok) {
         throw new Error("Failed to check enrollment status");
@@ -67,7 +67,7 @@ const EnrollmentPeriodCourses = () => {
 
   useEffect(() => {
     if (courses.length > 0) {
-      const ws = new WebSocket(`ws://localhost:8000/session/ws/${sessionName}`);
+      const ws = new WebSocket(`ws://127.0.0.1:8000/session/ws/${sessionName}`);
 
       ws.onopen = () => {
         console.log("WebSocket Connected");
@@ -100,7 +100,7 @@ const EnrollmentPeriodCourses = () => {
     setEnrolled(courseCode)
     try {
       const response = await fetch(
-        `http://localhost:8000/session/${sessionName}/enroll`,
+        `http://127.0.0.1:8000/session/${sessionName}/enroll`,
         {
           method: "POST",
           headers: {

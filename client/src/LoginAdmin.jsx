@@ -16,10 +16,11 @@ const LoginAdmin = () => {
     e.preventDefault();
     try {
       const data = await loginAdmin(email, password);
-      login(data.token, userType);
+      loginAdmin(data.token, userType);
       navigate("/admin/session");
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Login failed:");
+      console.error(error)
       toast.error("Unauthorized access. Attempt logged.");
     }
   };
