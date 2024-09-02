@@ -13,7 +13,7 @@ const RegisterStudent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await registerStudent(usn, email, password);
+      await registerStudent(usn.trim(), email.trim(), password.trim());
       toast.success("Registration successful");
       navigate("/login");
     } catch (error) {
@@ -35,12 +35,18 @@ const RegisterStudent = () => {
         <div className="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="usn" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="usn"
+                className="block text-sm font-medium text-gray-700"
+              >
                 USN
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-indigo-500" aria-hidden="true" />
+                  <User
+                    className="h-5 w-5 text-indigo-500"
+                    aria-hidden="true"
+                  />
                 </div>
                 <input
                   id="usn"
@@ -56,12 +62,18 @@ const RegisterStudent = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-indigo-500" aria-hidden="true" />
+                  <Mail
+                    className="h-5 w-5 text-indigo-500"
+                    aria-hidden="true"
+                  />
                 </div>
                 <input
                   id="email"
@@ -78,12 +90,18 @@ const RegisterStudent = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-indigo-500" aria-hidden="true" />
+                  <Lock
+                    className="h-5 w-5 text-indigo-500"
+                    aria-hidden="true"
+                  />
                 </div>
                 <input
                   id="password"

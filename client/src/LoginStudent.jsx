@@ -15,21 +15,25 @@ const LoginStudent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const data = await loginStudent(usn, password);
-      console.log(data);
-      login(data.token, userType, usn,data.previous_course,data.previous_course_id);
+      const data = await loginStudent(usn.trim(), password.trim());
+      login(
+        data.token,
+        userType,
+        usn,
+        data.previous_course,
+        data.previous_course_id
+      );
       navigate("/session");
     } catch (error) {
       console.log(error.toString());
-      if(error.toString() === "Error: Not registered"){
+      if (error.toString() === "Error: Not registered") {
         toast.error("Not registered. Please register first.");
         setTimeout(() => {
           navigate("/register");
         }, 1500);
-      }else if(error.toString() === "Error: Invalid Credentials"){
+      } else if (error.toString() === "Error: Invalid Credentials") {
         toast.error("Invalid credentials. Please try again.");
-      }else
-        toast.error(error.toString());
+      } else toast.error(error.toString());
     }
   };
 
@@ -46,12 +50,18 @@ const LoginStudent = () => {
         <div className="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="usn" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="usn"
+                className="block text-sm font-medium text-gray-700"
+              >
                 USN
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-indigo-500" aria-hidden="true" />
+                  <User
+                    className="h-5 w-5 text-indigo-500"
+                    aria-hidden="true"
+                  />
                 </div>
                 <input
                   id="usn"
@@ -68,12 +78,18 @@ const LoginStudent = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-indigo-500" aria-hidden="true" />
+                  <Lock
+                    className="h-5 w-5 text-indigo-500"
+                    aria-hidden="true"
+                  />
                 </div>
                 <input
                   id="password"

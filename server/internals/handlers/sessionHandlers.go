@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/AaronDennis07/electrum/internals/cache"
 	"github.com/AaronDennis07/electrum/internals/ctx"
@@ -204,7 +205,7 @@ func StartSession(c *fiber.Ctx) error {
 	}
 
 	for _, course := range sessionDb.Courses {
-		err = cache.Client.Redis.HSet(ctx.Ctx, courseKey, *course.Code, *course.Seats).Err()
+		err = cache.Client.Redis.HSet(ctx.Ctx, courseKey, course.ID, *course.Seats).Err()
 		if err != nil {
 			log.Println("populating session redis", err)
 		}
@@ -218,7 +219,7 @@ func StartSession(c *fiber.Ctx) error {
 			if err != nil {
 				log.Println("populating students redis", err)
 			}
-			cache.Client.Redis.HIncrBy(ctx.Ctx, courseKey, *enrollment.Course1.Code, -1)
+			cache.Client.Redis.HIncrBy(ctx.Ctx, courseKey, string(enrollment.Course1.ID), -1)
 
 		}
 		if enrollment.Course1ID == nil {
@@ -348,7 +349,7 @@ func EnrollToCourse(c *fiber.Ctx) error {
 		var session models.Session
 		db.Where("name=?", channel).First(&session)
 		var course models.Course
-		db.Where("code=? AND session_id=?", req.Course, session.ID).First(&course)
+		db.Where("id=? AND session_id=?", req.Course, session.ID).First(&course)
 
 		err = db.Model(&course).Update("seats_filled", gorm.Expr("seats_filled + ?", 1)).Error
 		err = db.Model(&session).Update("applied_students", gorm.Expr("applied_students + ?", 1)).Error
@@ -449,14 +450,25 @@ func GetSessionDetails(c *fiber.Ctx) error {
 }
 func SendEnrollmentsExcel(c *fiber.Ctx) error {
 	f := excelize.NewFile()
-	index, _ := f.NewSheet("Sheet1")
-	f.SetActiveSheet(index)
-
-	// Set the titles for the columns
-	f.SetCellValue("Sheet1", "A1", "Student ID")
-	f.SetCellValue("Sheet1", "B1", "Student Name")
-	f.SetCellValue("Sheet1", "C1", "Course Name")
-	f.SetCellValue("Sheet1", "D1", "Course Code")
+	f.NewSheet("AIML")
+	f.NewSheet("CSE")
+	f.NewSheet("ECE")
+	f.NewSheet("ISE")
+	f.NewSheet("EEE")
+	f.NewSheet("CIV")
+	f.NewSheet("CE")
+	rowCounters := make(map[string]int)
+	sheets := []string{"AIML", "CSE", "ECE", "ISE", "EEE", "CIV", "CE"}
+	for _, sheet := range sheets {
+		f.SetCellValue(sheet, "A1", "Student ID")
+		f.SetCellValue(sheet, "B1", "Student Name")
+		f.SetCellValue(sheet, "C1", "Course Name")
+		f.SetCellValue(sheet, "D1", "Course Code")
+		f.SetCellValue(sheet, "E1", "Enrollment Time")
+		f.SetCellValue(sheet, "F1", "Enrollment Date")
+		rowCounters[sheet] = 2
+	}
+	f.DeleteSheet("Sheet1")
 
 	// Retrieve enrollments from the database
 	db := database.DB.Db
@@ -469,16 +481,47 @@ func SendEnrollmentsExcel(c *fiber.Ctx) error {
 			"message": "Session does not exist",
 		})
 	}
-	db.Preload("Course1").Preload("Student").Where("session_id=?", session.ID).Find(&enrollments)
+	db.Preload("Course1").Preload("Student.Department").Where("session_id=?", session.ID).Find(&enrollments)
 
 	// Populate the Excel file
-	for i, enrollment := range enrollments {
-		row := i + 2 // Start from the second row, considering the header
-		log.Println(enrollment.Student.Name)
-		f.SetCellValue("Sheet1", "A"+strconv.Itoa(row), safeDerefString(enrollment.StudentID))
-		f.SetCellValue("Sheet1", "B"+strconv.Itoa(row), safeDerefString(enrollment.Student.Name))
-		f.SetCellValue("Sheet1", "C"+strconv.Itoa(row), safeDerefString(enrollment.Course1.Name))
-		f.SetCellValue("Sheet1", "D"+strconv.Itoa(row), safeDerefString(enrollment.Course1.Code))
+	for _, enrollment := range enrollments {
+
+		departmentName := safeDerefString(enrollment.Student.Department.Name)
+		row := rowCounters[departmentName]
+		if err := f.SetCellValue(departmentName, "A"+strconv.Itoa(row), safeDerefString(enrollment.StudentID)); err != nil {
+			log.Printf("Error setting cell value for StudentID %s in department %s at row %d: %v", safeDerefString(enrollment.StudentID), departmentName, row, err)
+		}
+		if err := f.SetCellValue(departmentName, "B"+strconv.Itoa(row), safeDerefString(enrollment.Student.Name)); err != nil {
+			log.Printf("Error setting cell value for StudentName %s in department %s at row %d: %v", safeDerefString(enrollment.StudentID), departmentName, row, err)
+		}
+		if err := f.SetCellValue(departmentName, "C"+strconv.Itoa(row), safeDerefString(enrollment.Course1.Name)); err != nil {
+			log.Printf("Error setting cell value for CourseName %s in department %s at row %d: %v", safeDerefString(enrollment.StudentID), departmentName, row, err)
+		}
+		if err := f.SetCellValue(departmentName, "D"+strconv.Itoa(row), safeDerefString(enrollment.Course1.Code)); err != nil {
+			log.Printf("Error setting cell value for CourseCode %s in department %s at row %d: %v", safeDerefString(enrollment.StudentID), departmentName, row, err)
+		}
+		timeValue := ""
+		enrollmentDate := ""
+		if !enrollment.Course1.UpdatedAt.IsZero() {
+			// Convert the time to Indian Standard Time (IST)
+			indianLocation, err := time.LoadLocation("Asia/Kolkata")
+			if err != nil {
+				log.Printf("Error loading Indian time zone: %v", err)
+			} else {
+				indianTime := enrollment.Course1.UpdatedAt.In(indianLocation)
+				timeValue = indianTime.Format("15:04:05")
+				enrollmentDate = indianTime.Format("2006-01-02") // Format as YYYY-MM-DD
+			}
+		}
+
+		if err := f.SetCellValue(departmentName, "E"+strconv.Itoa(row), timeValue); err != nil {
+			log.Printf("Error setting cell value in department %s at row %d: %v", departmentName, row, err)
+		}
+
+		if err := f.SetCellValue(departmentName, "F"+strconv.Itoa(row), enrollmentDate); err != nil {
+			log.Printf("Error setting enrollment date in department %s at row %d: %v", departmentName, row, err)
+		}
+		rowCounters[departmentName]++
 	}
 
 	// Save the Excel file to a buffer or a temporary file
@@ -528,9 +571,9 @@ func CheckEnrollment(c *fiber.Ctx) error {
 	}
 
 	return c.Status(http.StatusOK).JSON(fiber.Map{
-		"message":    "Student is enrolled ",
-		"coursecode": enrollment.Course1.Code,
-		"enrolled":   true,
+		"message":  "Student is enrolled ",
+		"course":   enrollment.Course1,
+		"enrolled": true,
 	})
 
 }

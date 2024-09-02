@@ -42,9 +42,9 @@ export function App() {
           <Route
             path="/admin/session"
             element={
-              <PrivateRoute allowedUserType="admin">
+            
                 <AdminSessionPage />
-              </PrivateRoute>
+         
             }
           />
           <Route
@@ -58,9 +58,9 @@ export function App() {
           <Route
             path="/admin/session/:sessionName"
             element={
-              <PrivateRoute allowedUserType="admin">
+             
                 <AdminSessionDashboard />
-              </PrivateRoute>
+           
             }
           />
           {/* <Route path="/enroll" element={<EnrollmentPeriodCourses />} /> */}

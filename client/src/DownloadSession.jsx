@@ -40,7 +40,7 @@ const DownloadSession = () => {
             "Content-Type":
               "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           },
-        },
+        }
       );
 
       if (!response.ok) {

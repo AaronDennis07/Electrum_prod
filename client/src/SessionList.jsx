@@ -8,16 +8,16 @@ const SessionListPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const {logout} = useAuth()
+  const { logout } = useAuth();
   const handleLogout = () => {
-   logout(); 
-    navigate('/login');
+    logout();
+    navigate("/login");
   };
 
   const handleHomeClick = () => {
-    navigate('/session'); // Adjust this path to your actual home page route
+    navigate("/session"); // Adjust this path to your actual home page route
   };
-  
+
   useEffect(() => {
     fetch("http://127.0.0.1:8000/session")
       .then((response) => {
@@ -30,9 +30,7 @@ const SessionListPage = () => {
         // Add random start times for upcoming sessions
         const enhancedData = data.map((session) => {
           if (session.status === "upcoming") {
-            const randomFutureDate = new Date(
-              Date.now() + Math.random() * 10 * 24 * 60 * 60 * 1000,
-            );
+            const randomFutureDate = new Date("2024-09-01 10:00:00");
             return { ...session, startTime: randomFutureDate };
           }
           return session;
@@ -60,7 +58,7 @@ const SessionListPage = () => {
   };
 
   const handleApply = (sessionName) => {
-    console.log(sessionName)
+    console.log(sessionName);
     navigate(`/enroll/${sessionName}`);
   };
 
@@ -97,10 +95,23 @@ const SessionListPage = () => {
         </>
       )}
       {session.status === "upcoming" && (
-        <p className="text-gray-600 mt-2">
-          Starts in: {session.startTime.toLocaleString()}
-        </p>
+        <>
+          <p className="text-gray-600 mt-2">
+            Starts on: {session.startTime.toLocaleString()}
+          </p>
+          <a
+            href={
+              "https://drive.google.com/file/d/1Ul00nRoUfpM_EckPopumgmZmajokIpjC/view?usp=sharing"
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2 inline-block"
+          >
+            View Syllabus
+          </a>
+        </>
       )}
+
       <p className="text-gray-500 text-sm mt-4">
         Created: {new Date(session.CreatedAt).toLocaleDateString()}
       </p>
@@ -126,49 +137,103 @@ const SessionListPage = () => {
 
   const liveSessions = sessions.filter((session) => session.status === "open");
   const upcomingSessions = sessions.filter(
-    (session) => session.status === "upcoming",
+    (session) => session.status === "upcoming"
   );
   const closedSessions = sessions.filter(
-    (session) => session.status === "closed",
+    (session) => session.status === "closed"
   );
 
   return (
     <div className="bg-gray-100 min-h-screen">
-         {/* Navbar */}
-<nav className="bg-indigo-600 p-4">
-  <div className="container mx-auto flex justify-between items-center">
-    <button onClick={handleHomeClick} className="text-white hover:text-indigo-200">
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-      </svg>
-    </button>
-    <div className="text-white text-2xl font-bold">Electrum@NHCE</div>
-    <div className="hidden md:flex items-center">
-      <button onClick={handleLogout} className="text-white hover:text-indigo-200">Logout</button>
-    </div>
-    <div className="md:hidden">
-      <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white">
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-        </svg>
-      </button>
-    </div>
-  </div>
-</nav>
+      {/* Navbar */}
+      <nav className="bg-indigo-600 p-4">
+        <div className="container mx-auto flex justify-between items-center">
+          <button
+            onClick={handleHomeClick}
+            className="text-white hover:text-indigo-200"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              ></path>
+            </svg>
+          </button>
+          <div className="text-white text-2xl font-bold">Electrum@NHCE</div>
+          <div className="hidden md:flex items-center">
+            <button
+              onClick={handleLogout}
+              className="text-white hover:text-indigo-200"
+            >
+              Logout
+            </button>
+          </div>
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-white"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16m-7 6h7"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </nav>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-indigo-500 p-4">
-          <button onClick={handleHomeClick} className="block text-white mb-2">Home</button>
-          <button onClick={handleLogout} className="block text-white">Logout</button>
+          <button onClick={handleHomeClick} className="block text-white mb-2">
+            Home
+          </button>
+          <button onClick={handleLogout} className="block text-white">
+            Logout
+          </button>
         </div>
       )}
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Session List</h1>
-      {renderSessionSection("Live", liveSessions)}
-      {renderSessionSection("Upcoming", upcomingSessions)}
-      {renderSessionSection("Closed", closedSessions)}
-    </div>
+      <div className="bg-white border-b border-gray-200 py-4">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-gray-600">
+            <p className="text-sm mb-1">
+              Designed & Developed by <strong>S Aaron Dennis </strong>and{" "}
+              <strong> Surya K N</strong> (Final Year Students, CSE Department,
+              NHCE)
+            </p>
+
+            <p className="text-sm mb-1">
+              Under the Guidance of <strong> Ms. Asha Rani Borah </strong>{" "}
+              (Senior AP, CSE Dept, NHCE) and <strong>Dr. R J Anandhi </strong>
+              (Prof & Dean Academics, NHCE)
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Session List</h1>
+        {renderSessionSection("Live", liveSessions)}
+        {renderSessionSection("Upcoming", upcomingSessions)}
+        {renderSessionSection("Closed", closedSessions)}
+      </div>
     </div>
   );
 };
