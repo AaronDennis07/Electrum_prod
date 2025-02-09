@@ -34,6 +34,10 @@ type StudentLoginRequest struct {
 	Password string `json:"password"`
 }
 
+type ResetPasswordRequest struct {
+	USN string `json:"usn"`
+}
+
 func isPasswordEmpty(student models.Student) bool {
 
 	return student.Password == nil || *student.Password == ""
@@ -263,4 +267,37 @@ func AuthMiddlewareAdmin(c *fiber.Ctx) error {
 	c.Locals("is_admin", claims["is_admin"])
 
 	return c.Next()
+}
+
+func ResetStudentPassword(c *fiber.Ctx) error {
+	request := new(ResetPasswordRequest)
+	if err := c.BodyParser(request); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Cannot parse JSON",
+		})
+	}
+
+	db := database.DB.Db
+	var student models.Student
+	result := db.Where("USN = ?", request.USN).First(&student)
+
+	if result.Error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Student not found",
+		})
+	}
+
+	// Set password to empty to trigger registration flow
+	emptyPassword := ""
+	result = db.Model(&student).Update("password", &emptyPassword)
+
+	if result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Cannot reset password",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Password reset successful. Student needs to register again.",
+	})
 }

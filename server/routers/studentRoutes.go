@@ -9,5 +9,5 @@ func SetupStudentRoutes(app *fiber.App) {
 	api := app.Group("api/v1/student")
 
 	api.Post("/upload", handlers.UploadStudent)
-
+	app.Post("/auth/student/reset-password", handlers.ResetStudentPassword)
 }

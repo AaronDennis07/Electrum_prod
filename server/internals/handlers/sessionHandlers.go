@@ -438,15 +438,25 @@ func GetAllSessions(c *fiber.Ctx) error {
 func GetSessionDetails(c *fiber.Ctx) error {
 	db := database.DB.Db
 	sessionName := c.Params("session")
+
 	var session models.Session
-	// var enrollments []models.Enrollment
-	db.Preload("Courses").Where("name=?", sessionName).First(&session)
 
-	return c.Status(http.StatusOK).JSON(fiber.Map{
+	// Use a subquery to count enrollments for each course
+	err := db.Preload("Courses", func(db *gorm.DB) *gorm.DB {
+		return db.Select("courses.*, COUNT(enrollments.course1_id) as seats_filled").
+			Joins("LEFT JOIN enrollments ON enrollments.course1_id = courses.id").
+			Group("courses.id")
+	}).Where("name = ?", sessionName).First(&session).Error
+
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "Session not found",
+		})
+	}
+
+	return c.JSON(fiber.Map{
 		"session": session,
-		// "enrollments": enrollments,
 	})
-
 }
 func SendEnrollmentsExcel(c *fiber.Ctx) error {
 	f := excelize.NewFile()

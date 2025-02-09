@@ -197,7 +197,10 @@ const EnrollmentPeriodCourses = () => {
             </svg>
           </button>
           <div className="text-white text-2xl font-bold">Electrum@NHCE</div>
-          <div className="hidden md:flex items-center">
+          <div className="hidden md:flex items-center space-x-4">
+            <span className="text-white text-sm">
+              USN: {user.userId}
+            </span>
             <button
               onClick={handleLogout}
               className="text-white hover:text-indigo-200"
@@ -232,6 +235,9 @@ const EnrollmentPeriodCourses = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-indigo-500 p-4">
+          <span className="block text-white mb-2">
+            USN: {user.userId}
+          </span>
           <button onClick={handleHomeClick} className="block text-white mb-2">
             Home
           </button>
@@ -274,108 +280,100 @@ const EnrollmentPeriodCourses = () => {
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course) => {
-            let shouldShowCourse = true;
-
-            // Check conditions
-            if (course.Code === user?.previous_course_id) {
-              shouldShowCourse = false;
-            } else if (
-              course.Code === "23NHOP708" &&
-              user?.previous_course_id !== "23NHOP707"
-            ) {
-              shouldShowCourse = false;
-            } else if (
-              course.Code === "23NHOP714" &&
-              user?.previous_course_id !== "23NHOP711"
-            ) {
-              shouldShowCourse = false;
-            } else if (
-              course.Code === "23NHOP704" &&
-              user?.userId?.includes("ME")
-            ) {
-              shouldShowCourse = false;
-            } else if (
-              course.Code === "23NHOP706" &&
-              user?.userId?.includes("EE")
-            ) {
-              shouldShowCourse = false;
-            }
-            return shouldShowCourse ? (
-              <div
-                key={course.Id}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-indigo-100"
-              >
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-2 text-indigo-700">
-                    {course.Name.split("(")[0].trim()}
-                  </h2>
-                  <p className="text-gray-600 mb-1">
-                    Course Code: {course.Code}
-                  </p>
-                  <p className="text-gray-600 mb-4">
-                    Slot:{" "}
-                    <span
-                      className={`text-black px-2 py-1 rounded ${
-                        course.Name.match(/\(([^)]+)\)/)[1] === "Morning"
-                          ? "bg-yellow-300"
-                          : course.Name.match(/\(([^)]+)\)/)[1] === "Afternoon"
-                            ? "bg-orange-300"
-                            : "bg-purple-300"
-                      }`}
-                    >
-                      {course.Name.match(/\(([^)]+)\)/)[1]}
-                    </span>
-                  </p>
-                  <div className="mb-4">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium text-gray-700">
-                        Available Seats:
-                      </span>
-                      <span className="text-sm font-medium text-indigo-600">
-                        {course.availableSeats} / {course.Seats}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div
-                        className="bg-indigo-600 h-2.5 rounded-full transition-all duration-500 ease-in-out"
-                        style={{
-                          width: `${(course.availableSeats / course.Seats) * 100}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                  <button
-                    className={`w-full font-bold py-2 px-4 rounded transition duration-300 disabled:cursor-not-allowed ${
-                      enrollingCourse === course.Code
-                        ? "bg-indigo-500 hover:bg-indigo-700 text-white"
-                        : enrolled?.ID === course.Id
-                          ? "bg-green-500 text-white disabled:bg-green-500 disabled:text-white"
-                          : course.availableSeats === 0
-                            ? "bg-red-500 text-white disabled:bg-red-500"
-                            : enrolled !== null
-                              ? "bg-gray-300 text-gray-700"
-                              : "bg-indigo-500 hover:bg-indigo-700 text-white"
-                    }`}
-                    onClick={() => handleEnrollConfirm(course)}
-                    disabled={
-                      enrollingCourse === course.Code ||
-                      course.availableSeats === 0 ||
-                      enrolled !== null
+          {courses.map((course) => (
+            <div
+              key={course.Id}
+              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-indigo-100"
+            >
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-2 text-indigo-700">
+                  {(() => {
+                    try {
+                      return course.Name.split("(")[0].trim();
+                    } catch (error) {
+                      console.error("Error parsing course name:", error, course);
+                      return course.Name || "Course Name Not Available";
                     }
-                  >
-                    {enrollingCourse === course.Code
-                      ? "Enrolling..."
-                      : enrolled?.ID === course.Id
-                        ? "Enrolled"
-                        : course.availableSeats === 0
-                          ? "Full"
-                          : "Enroll"}
-                  </button>
+                  })()}
+                </h2>
+                <p className="text-gray-600 mb-1">
+                  Course Code: {course.Code || "N/A"}
+                </p>
+                {(() => {
+                  try {
+                    const match = course.Name.match(/\(([^)]+)\)/);
+                    if (!match) return null; // Don't show slot section if no slot info
+
+                    const slot = match[1];
+                    return (
+                      <p className="text-gray-600 mb-4">
+                        Slot:{" "}
+                        <span
+                          className={`text-black px-2 py-1 rounded ${
+                            slot.toLowerCase() === "morning"
+                              ? "bg-yellow-300"
+                              : slot.toLowerCase() === "afternoon"
+                                ? "bg-orange-300"
+                                : "bg-purple-300"
+                          }`}
+                        >
+                          {slot}
+                        </span>
+                      </p>
+                    );
+                  } catch (error) {
+                    console.error("Error parsing course slot:", error, course);
+                    return null; // Don't show slot section if there's an error
+                  }
+                })()}
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium text-gray-700">
+                      Available Seats:
+                    </span>
+                    <span className="text-sm font-medium text-indigo-600">
+                      {course.availableSeats} / {course.Seats}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-indigo-600 h-2.5 rounded-full transition-all duration-500 ease-in-out"
+                      style={{
+                        width: `${(course.availableSeats / course.Seats) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
                 </div>
+                <button
+                  className={`w-full font-bold py-2 px-4 rounded transition duration-300 disabled:cursor-not-allowed ${
+                    enrollingCourse === course.Code
+                      ? "bg-indigo-500 hover:bg-indigo-700 text-white"
+                      : enrolled?.ID === course.Id
+                        ? "bg-green-500 text-white disabled:bg-green-500 disabled:text-white"
+                        : course.availableSeats === 0
+                          ? "bg-red-500 text-white disabled:bg-red-500"
+                          : enrolled !== null
+                            ? "bg-gray-300 text-gray-700"
+                            : "bg-indigo-500 hover:bg-indigo-700 text-white"
+                  }`}
+                  onClick={() => handleEnrollConfirm(course)}
+                  disabled={
+                    enrollingCourse === course.Code ||
+                    course.availableSeats === 0 ||
+                    enrolled !== null
+                  }
+                >
+                  {enrollingCourse === course.Code
+                    ? "Enrolling..."
+                    : enrolled?.ID === course.Id
+                      ? "Enrolled"
+                      : course.availableSeats === 0
+                        ? "Full"
+                        : "Enroll"}
+                </button>
               </div>
-            ) : null;
-          })}
+            </div>
+          ))}
         </div>
       </div>
       {isConfirmOpen && (

@@ -81,3 +81,20 @@ export const fetchWithAuth = async (url, options = {}) => {
 
   return response;
 };
+
+export const resetStudentPassword = async (usn) => {
+  const response = await fetch(`${API_URL}/student/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ usn }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to reset password");
+  }
+
+  return response.json();
+};

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import { resetStudentPassword } from "./api";
+import { toast, Toaster } from "react-hot-toast";
 
 const AdminSessionPage = () => {
   const [sessions, setSessions] = useState([]);
@@ -8,6 +10,9 @@ const AdminSessionPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [resetUsn, setResetUsn] = useState("");
+  const [isResetting, setIsResetting] = useState(false);
 
   const { logout } = useAuth();
 
@@ -79,6 +84,22 @@ const AdminSessionPage = () => {
         return "bg-yellow-500";
       default:
         return "bg-gray-500";
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setIsResetting(true);
+    
+    try {
+      await resetStudentPassword(resetUsn.trim());
+      toast.success("Password reset successful");
+      setIsResetModalOpen(false);
+      setResetUsn("");
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -217,9 +238,60 @@ const AdminSessionPage = () => {
         >
           Upload
         </button>
+        <Toaster position="top-right" />
+        <button
+          className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mx-2"
+          onClick={() => setIsResetModalOpen(true)}
+        >
+          Reset Password
+        </button>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sessions.map(renderSessionCard)}
         </div>
+
+        {/* Reset Password Modal */}
+        {isResetModalOpen && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+                  Reset Student Password
+                </h3>
+                <form onSubmit={handleResetPassword}>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      value={resetUsn}
+                      onChange={(e) => setResetUsn(e.target.value)}
+                      placeholder="Enter student USN"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                      required
+                    />
+                  </div>
+                  <div className="flex justify-end mt-4 space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsResetModalOpen(false);
+                        setResetUsn("");
+                      }}
+                      className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isResetting}
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    >
+                      {isResetting ? "Resetting..." : "Reset Password"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
