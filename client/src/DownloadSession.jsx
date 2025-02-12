@@ -8,15 +8,15 @@ const DownloadSession = () => {
 
   useEffect(() => {
     fetchSessions().then(() => {
-      console.log("success");
+      //console.log("success");
     });
-    console.log(sessions);
+    //console.log(sessions);
   }, []);
 
   const fetchSessions = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://127.0.0.1:8000/session");
+      const response = await fetch("https://backendelectrumnhce.sunkn.tech/session");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -33,7 +33,7 @@ const DownloadSession = () => {
   const handleDownload = async (sessionName) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/session/${sessionName}/excel`,
+        `https://backendelectrumnhce.sunkn.tech/session/${sessionName}/excel`,
         {
           method: "GET",
           headers: {

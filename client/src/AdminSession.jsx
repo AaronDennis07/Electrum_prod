@@ -30,7 +30,7 @@ const AdminSessionPage = () => {
   }, []);
 
   const fetchSessions = () => {
-    fetch("http://127.0.0.1:8000/session")
+    fetch("https://backendelectrumnhce.sunkn.tech/session")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -52,7 +52,7 @@ const AdminSessionPage = () => {
   };
 
   const handleStartStop = (sessionName, action) => {
-    fetch(`http://127.0.0.1:8000/session/${sessionName}/${action}`, {
+    fetch(`https://backendelectrumnhce.sunkn.tech/session/${sessionName}/${action}`, {
       method: "POST",
     })
       .then((response) => {

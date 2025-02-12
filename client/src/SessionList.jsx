@@ -19,7 +19,7 @@ const SessionListPage = () => {
   };
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/session")
+    fetch("https://backendelectrumnhce.sunkn.tech/session")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -58,7 +58,7 @@ const SessionListPage = () => {
   };
 
   const handleApply = (sessionName) => {
-    console.log(sessionName);
+    //console.log(sessionName);
     navigate(`/enroll/${sessionName}`);
   };
 

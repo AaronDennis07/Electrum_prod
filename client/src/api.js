@@ -1,7 +1,7 @@
-const API_URL = "http://127.0.0.1:8000/auth"; // Replace with your API URL
+const API_URL = "https://backendelectrumnhce.sunkn.tech/auth"; // Replace with your API URL
 
 export const loginStudent = async (usn, password) => {
-  console.log(usn, password);
+  //console.log(usn, password);
   const response = await fetch(`${API_URL}/student/login`, {
     method: "POST",
     headers: {
@@ -22,7 +22,7 @@ export const loginStudent = async (usn, password) => {
   return response.json();
 };
 export const registerStudent = async (usn, email, password) => {
-  console.log(usn, password);
+  //console.log(usn, password);
   const response = await fetch(`${API_URL}/student/register`, {
     method: "POST",
     headers: {

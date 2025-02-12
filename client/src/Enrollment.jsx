@@ -11,7 +11,7 @@ const EnrollmentPeriodCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [enrollingCourse, setEnrollingCourse] = useState(null);
+  const [enrollingCourseId, setEnrollingCourseId] = useState(null);
   const [enrolled, setEnrolled] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const EnrollmentPeriodCourses = () => {
   };
 
   useEffect(() => {
-    // console.log(user);
+    // //console.log(user);
     if (user && user.userId) {
       fetchCourses();
     } else {
@@ -40,7 +40,7 @@ const EnrollmentPeriodCourses = () => {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/session/${sessionName}`);
+      const response = await fetch(`https://backendelectrumnhce.sunkn.tech/session/${sessionName}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -63,17 +63,17 @@ const EnrollmentPeriodCourses = () => {
     checkEnrollmentStatus();
   };
   const checkEnrollmentStatus = async () => {
-    // console.log("helooooooooooooooooooooooooo");
+    // //console.log("helooooooooooooooooooooooooo");
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/session/${sessionName}/checkenrollment/${user.userId}`
+        `https://backendelectrumnhce.sunkn.tech/session/${sessionName}/checkenrollment/${user.userId}`
       );
       if (!response.ok) {
         throw new Error("Failed to check enrollment status");
       }
 
       const data = await response.json();
-      // console.log(data);
+      // //console.log(data);
       if (data.enrolled) {
         setEnrolled(data.course);
       }
@@ -90,7 +90,7 @@ const EnrollmentPeriodCourses = () => {
       );
 
       ws.onopen = () => {
-        console.log("WebSocket Connected");
+        //console.log("WebSocket Connected");
       };
 
       ws.onmessage = (event) => {
@@ -106,7 +106,7 @@ const EnrollmentPeriodCourses = () => {
       };
 
       ws.onclose = () => {
-        console.log("WebSocket Disconnected");
+        // console.log("WebSocket Disconnected");
       };
 
       return () => {
@@ -127,14 +127,14 @@ const EnrollmentPeriodCourses = () => {
 
   const handleEnrollSubmit = async () => {
     if (!selectedCourse) return;
-
-    setEnrollingCourse(selectedCourse.Code);
+    
+    setEnrollingCourseId(selectedCourse.Id);
 
     setIsConfirmOpen(false);
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/session/${sessionName}/enroll`,
+        `https://backendelectrumnhce.sunkn.tech/session/${sessionName}/enroll`,
         {
           method: "POST",
           headers: {
@@ -151,17 +151,45 @@ const EnrollmentPeriodCourses = () => {
         const data = await response.json();
         throw new Error(data.message);
       }
-
+      
       toast.success(`Successfully enrolled in course ${selectedCourse.Code}`);
       checkEnrollmentStatus();
     } catch (error) {
       toast.error(`${error.message}`);
       setEnrolled(null);
     } finally {
-      
-      setEnrollingCourse(null);
+      setEnrollingCourseId(null);
       setSelectedCourse(null);
     }
+  };
+
+  // Helper function to determine slot background color based on slot name.
+  const getSlotBgColor = (slot) => {
+    const lowerSlot = slot.toLowerCase();
+    // Define an object that maps each slot category to an array of color classes.
+    const mapping = {
+      morning: ["bg-yellow-300", "bg-yellow-400", "bg-yellow-500"],
+      afternoon: ["bg-orange-300", "bg-orange-400", "bg-orange-500"],
+      evening: ["bg-purple-300", "bg-purple-400", "bg-purple-500"],
+    };
+
+    // Loop through the keys and check if the slot matches the category.
+    for (const key in mapping) {
+      if (lowerSlot.includes(key)) {
+        // Try to extract a number from the slot string.
+        const match = lowerSlot.match(/\d+/);
+        let index = 0;
+        if (match && match[0]) {
+          // Use the number as an index (adjusted by -1 for array index).
+          index = parseInt(match[0], 10) - 1;
+          // Clamp the index to the bounds of our colors array.
+          if (index < 0) index = 0;
+          if (index >= mapping[key].length) index = mapping[key].length - 1;
+        }
+        return mapping[key][index];
+      }
+    }
+    return "bg-gray-300"; // Default color if no matching slot category is found.
   };
 
   // if (!user.userId) {
@@ -291,7 +319,11 @@ const EnrollmentPeriodCourses = () => {
                     try {
                       return course.Name.split("(")[0].trim();
                     } catch (error) {
-                      console.error("Error parsing course name:", error, course);
+                      console.error(
+                        "Error parsing course name:",
+                        error,
+                        course
+                      );
                       return course.Name || "Course Name Not Available";
                     }
                   })()}
@@ -302,28 +334,27 @@ const EnrollmentPeriodCourses = () => {
                 {(() => {
                   try {
                     const match = course.Name.match(/\(([^)]+)\)/);
-                    if (!match) return null; // Don't show slot section if no slot info
-
+                    if (!match) return null;
                     const slot = match[1];
                     return (
                       <p className="text-gray-600 mb-4">
                         Slot:{" "}
                         <span
-                          className={`text-black px-2 py-1 rounded ${
-                            slot.toLowerCase() === "morning"
-                              ? "bg-yellow-300"
-                              : slot.toLowerCase() === "afternoon"
-                                ? "bg-orange-300"
-                                : "bg-purple-300"
-                          }`}
+                          className={`text-black px-2 py-1 rounded ${getSlotBgColor(
+                            slot
+                          )}`}
                         >
                           {slot}
                         </span>
                       </p>
                     );
                   } catch (error) {
-                    console.error("Error parsing course slot:", error, course);
-                    return null; // Don't show slot section if there's an error
+                    console.error(
+                      "Error parsing course slot:",
+                      error,
+                      course
+                    );
+                    return null;
                   }
                 })()}
                 <div className="mb-4">
@@ -345,31 +376,31 @@ const EnrollmentPeriodCourses = () => {
                   </div>
                 </div>
                 <button
-                  className={`w-full font-bold py-2 px-4 rounded transition duration-300 disabled:cursor-not-allowed ${
-                    enrollingCourse === course.Code
+                  className={`w-full font-bold py-2 px-4 rounded transition duration-300 disabled:cursor-not-allowed disabled:opacity-50 ${
+                    enrollingCourseId === course.Id
                       ? "bg-indigo-500 hover:bg-indigo-700 text-white"
-                      : enrolled?.ID === course.Id
-                        ? "bg-green-500 text-white disabled:bg-green-500 disabled:text-white"
-                        : course.availableSeats === 0
-                          ? "bg-red-500 text-white disabled:bg-red-500"
-                          : enrolled !== null
-                            ? "bg-gray-300 text-gray-700"
-                            : "bg-indigo-500 hover:bg-indigo-700 text-white"
+                      : course.availableSeats === 0
+                      ? "bg-red-500 text-white"
+                      : enrolled
+                      ? enrolled.ID === course.Id
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-300 text-gray-700"
+                      : "bg-indigo-500 hover:bg-indigo-700 text-white"
                   }`}
                   onClick={() => handleEnrollConfirm(course)}
                   disabled={
-                    enrollingCourse === course.Code ||
+                    enrollingCourseId !== null ||
                     course.availableSeats === 0 ||
                     enrolled !== null
                   }
                 >
-                  {enrollingCourse === course.Code
+                  {enrollingCourseId === course.Id
                     ? "Enrolling..."
                     : enrolled?.ID === course.Id
-                      ? "Enrolled"
-                      : course.availableSeats === 0
-                        ? "Full"
-                        : "Enroll"}
+                    ? "Enrolled"
+                    : course.availableSeats === 0
+                    ? "Full"
+                    : "Enroll"}
                 </button>
               </div>
             </div>
