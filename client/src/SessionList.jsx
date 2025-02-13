@@ -96,9 +96,6 @@ const SessionListPage = () => {
       )}
       {session.status === "upcoming" && (
         <>
-          <p className="text-gray-600 mt-2">
-            Starts on: {session.startTime.toLocaleString()}
-          </p>
           <a
             href={
               "https://drive.google.com/file/d/1Ul00nRoUfpM_EckPopumgmZmajokIpjC/view?usp=sharing"
