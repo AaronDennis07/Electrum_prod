@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { getAllSessions, downloadSessionExcel } from "./api";
 
 const DownloadSession = () => {
   const [sessions, setSessions] = useState([]);
@@ -7,20 +8,13 @@ const DownloadSession = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchSessions().then(() => {
-      //console.log("success");
-    });
-    //console.log(sessions);
+    fetchSessions();
   }, []);
 
   const fetchSessions = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://backendelectrumnhce.sunkn.tech/session");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
+      const data = await getAllSessions();
       setSessions(data);
       setLoading(false);
     } catch (error) {
@@ -30,29 +24,15 @@ const DownloadSession = () => {
     }
   };
 
-  const handleDownload = async (sessionName) => {
+  const handleDownload = async (session) => {
     try {
-      const response = await fetch(
-        `https://backendelectrumnhce.sunkn.tech/session/${sessionName}/excel`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type":
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Enrollment failed");
-      }
-      const blob = await response.blob();
+      const blob = await downloadSessionExcel(session.ID);
       const url = window.URL.createObjectURL(blob);
 
       // Create a link element and trigger the download
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `${sessionName}.xlsx`);
+      link.setAttribute("download", `${session.name || `session_${session.ID}`}.xlsx`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -90,7 +70,7 @@ const DownloadSession = () => {
               </div>
               <button
                 className="w-full bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                onClick={() => handleDownload(session.name)}
+                onClick={() => handleDownload(session)}
               >
                 Download
               </button>

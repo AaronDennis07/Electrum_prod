@@ -4,6 +4,8 @@ services:
     image: suryakn/electrum-frontend-prod:newaws
     ports:
       - 5173:5173
+    networks:
+      - electrum
     depends_on:
       - backend
 
@@ -15,15 +17,16 @@ services:
     environment:
       - DB_URL=postgres://postgres:postgres@db:5432/electrumDB
       - REDIS_URL=redis-db:6379
-
     networks:
       - electrum
     depends_on:
-      - db
-      - redis-db
+      db:
+        condition: service_healthy
+      redis-db:
+        condition: service_healthy
 
   db:
-    image: postgres
+    image: postgres:16
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -32,12 +35,23 @@ services:
     environment:
       - POSTGRES_DB=electrumDB
       - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d electrumDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   redis-db:
     image: redis
     restart: always
     networks:
       - electrum
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   db-data:

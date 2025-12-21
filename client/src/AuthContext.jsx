@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }) => {
     previous_course,
     previous_course_id
   ) => {
-    previous_course_id = previous_course_id?.replace("6", "7");
     localStorage.setItem("token", token);
     localStorage.setItem("userType", userType);
     localStorage.setItem(
