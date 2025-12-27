@@ -39,7 +39,7 @@ type Student struct {
 	Usn              string         `gorm:"primaryKey" json:"usn"`
 	Name             *string        `json:"name"`
 	Email            *string        `json:"email"`
-	Password         *string        `json:"-"`
+	Password         *string        `json:"password"`
 	DepartmentID     *uint          `json:"department_id"`
 	Department       Department     `json:"-"`
 	PreviousCourse   *string        `json:"previous_course"`
@@ -73,4 +73,19 @@ type CourseData struct {
 	Code       *string
 	Seats      uint
 	Department *string
+}
+
+// CourseRule defines filtering rules for course visibility during enrollment
+// RuleType can be:
+//   - "hide_if_taken": Hide this course if student previously took the course specified in TargetCourseCode
+//   - "requires_prerequisite": Show this course ONLY if student took the prerequisite in TargetCourseCode
+//   - "mutually_exclusive": Hide this course if student took any course in the ExclusionGroup
+type CourseRule struct {
+	gorm.Model
+	SessionID        *uint   `json:"session_id"`
+	Session          Session `json:"-"`
+	CourseCode       *string `json:"course_code"`       // The course this rule applies to
+	RuleType         *string `json:"rule_type"`         // hide_if_taken, requires_prerequisite, mutually_exclusive
+	TargetCourseCode *string `json:"target_course_code"` // For prerequisites/hide_if_taken
+	ExclusionGroup   *string `json:"exclusion_group"`   // Group name for mutually exclusive courses
 }

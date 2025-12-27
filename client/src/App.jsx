@@ -1,7 +1,5 @@
 import CreateSessionForm from "./CreateSession.jsx";
-// import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
-import { BrowserRouter, Route, Router, Routes } from "react-router-dom";
-import { UserProvider, Login } from "./UserContext.jsx";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import EnrollmentPeriodCourses from "./Enrollment.jsx";
 import SessionListPage from "./SessionList.jsx";
@@ -14,20 +12,57 @@ import LoginAdmin from "./LoginAdmin.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
 import LoginStudent from "./LoginStudent.jsx";
 import RegisterStudent from "./RegisterStudent.jsx";
+import AdminStudents from "./AdminStudents.jsx";
+import AdminDepartments from "./AdminDepartments.jsx";
 
 export function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public Routes */}
           <Route path="/admin/login" element={<LoginAdmin />} />
           <Route path="/login" element={<LoginStudent />} />
           <Route path="/register" element={<RegisterStudent />} />
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin/session"
+            element={
+              <PrivateRoute allowedUserType="admin">
+                <AdminSessionPage />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/admin/create"
             element={
               <PrivateRoute allowedUserType="admin">
                 <CreateSessionForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/upload"
+            element={
+              <PrivateRoute allowedUserType="admin">
+                <UploadStudent />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/students"
+            element={
+              <PrivateRoute allowedUserType="admin">
+                <AdminStudents />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/departments"
+            element={
+              <PrivateRoute allowedUserType="admin">
+                <AdminDepartments />
               </PrivateRoute>
             }
           />
@@ -40,37 +75,21 @@ export function App() {
             }
           />
           <Route
-            path="/admin/session"
-            element={
-            
-                <AdminSessionPage />
-         
-            }
-          />
-          <Route
-            path="/admin/upload"
+            path="/admin/session/:sessionId"
             element={
               <PrivateRoute allowedUserType="admin">
-                <UploadStudent />
+                <AdminSessionDashboard />
               </PrivateRoute>
             }
           />
+
+          {/* Student Routes */}
           <Route
-            path="/admin/session/:sessionName"
+            path="/enroll/:sessionId"
             element={
-             
-                <AdminSessionDashboard />
-           
-            }
-          />
-          {/* <Route path="/enroll" element={<EnrollmentPeriodCourses />} /> */}
-          {/* <Route path="/create" element={<CreateSessionForm />} /> */}
-          <Route
-            path="/enroll/:sessionName"
-            element={
-              // <PrivateRoute allowedUserType="student">
+              <PrivateRoute allowedUserType="student">
                 <EnrollmentPeriodCourses />
-              // </PrivateRoute>
+              </PrivateRoute>
             }
           />
           <Route
@@ -81,17 +100,14 @@ export function App() {
               </PrivateRoute>
             }
           />
-          {/* <Route path="/enroll/:sessionName" element={<EnrollmentPeriodCourses />} /> */}
-          {/* <Route path="/download" element={<DownloadSession />} /> */}
-          {/* <Route path="/admin/session" element={<AdminSessionPage />} /> */}
-          {/* <Route path="/admin/upload" element={<UploadStudent />} /> */}
-          {/* // In your Routes element */}
-          {/* <Route path="/admin/session/:sessionName" element={<AdminSessionDashboard />} /> */}
-          {/* <Route path="/*" element={<Navigate to="/login" replace />} /> */}
+
+          {/* Default redirect */}
           <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
 }
+
 export default App;

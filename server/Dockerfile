@@ -1,4 +1,4 @@
-FROM golang:1.22 AS build-stage
+FROM golang:1.23 AS build-stage
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ WORKDIR /
 
 COPY --from=build-stage /electrum /electrum
 
-EXPOSE 8080
+EXPOSE 8000
 
 USER nonroot:nonroot
 

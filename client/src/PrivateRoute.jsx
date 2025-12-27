@@ -4,7 +4,7 @@ import { useAuth } from "./AuthContext";
 const PrivateRoute = ({ children, allowedUserType }) => {
   const { user } = useAuth();
   const location = useLocation();
-  console.log(user);
+  //console.log(user);
   if (!user) {
     if(allowedUserType === "admin")
       return <Navigate to="/admin/login" state={{ from: location }} replace />;

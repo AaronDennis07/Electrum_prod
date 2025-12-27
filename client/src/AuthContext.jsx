@@ -11,9 +11,9 @@ export const AuthProvider = ({ children }) => {
     const previous_course = localStorage.getItem("previous_course");
     const previous_course_id = localStorage.getItem("previous_course_id");
     const userId = localStorage.getItem("userId");
-    console.log(userType);
-    console.log(token);
-    console.log(userId);
+    //console.log(userType);
+    //console.log(token);
+    //console.log(userId);
     if (token && userType && userId) {
       setUser({ token, userType, userId, previous_course, previous_course_id });
     }
@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }) => {
     previous_course,
     previous_course_id
   ) => {
-    previous_course_id = previous_course_id?.replace("6", "7");
     localStorage.setItem("token", token);
     localStorage.setItem("userType", userType);
     localStorage.setItem(
